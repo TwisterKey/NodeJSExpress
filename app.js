@@ -47,7 +47,7 @@ app.get(`/api/v1/tours/:id`, (req, res) => {
       tours: tour,
     },
   });
-  res.send(console.log('hau'));
+  res.send(console.log('Scuccess'));
 });
 
 app.post('/api/v1/tours', (req, res) => {
