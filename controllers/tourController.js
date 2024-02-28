@@ -1,8 +1,28 @@
 const fs = require('fs');
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
+  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`),
 );
+
+const checkID = (req, res, next, val) => {
+  const { id } = req.params;
+  // const id = req.params.id * 1;
+  if (!tours[id])
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  next();
+};
+
+const checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price)
+    return res.status(400).json({
+      status: 'fail',
+      message: 'price and name not included',
+    });
+  next();
+};
 
 const getAllTours = (req, res) => {
   console.log(req.requestTime);
@@ -17,21 +37,11 @@ const getAllTours = (req, res) => {
 };
 
 const getTour = (req, res) => {
-  //   console.log(req.params);
-  const { id } = req.params;
-  // const id = req.params.id * 1;
-  const tour = tours[id];
-  if (!tours[id])
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
   res.status(200).json({
     status: 'success',
     results: tours.length,
     data: {
-      //   tours: tours[+req.params.id],
-      tours: tour,
+      tours: tours[+req.params.id],
     },
   });
   res.send(console.log('Scuccess'));
@@ -54,17 +64,11 @@ const createTour = (req, res) => {
           tour: newTour,
         },
       });
-    }
+    },
   );
 };
 
 const updateTour = (req, res) => {
-  if (!tours[+req.params.id])
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-
   res.status(200).json({
     status: 'success',
     data: {
@@ -75,12 +79,6 @@ const updateTour = (req, res) => {
 };
 
 const deleteTour = (req, res) => {
-  if (!tours[+req.params.id])
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-
   res.status(204).json({
     status: 'success',
     data: null,
@@ -88,4 +86,12 @@ const deleteTour = (req, res) => {
   console.log('Success');
 };
 
-module.exports = { getAllTours, getTour, updateTour, deleteTour, createTour };
+module.exports = {
+  getAllTours,
+  getTour,
+  updateTour,
+  deleteTour,
+  createTour,
+  checkID,
+  checkBody,
+};
