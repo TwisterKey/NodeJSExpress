@@ -97,7 +97,7 @@ tourSchema.pre(/^find/, function (next) {
   //this points to the current query
   this.start = Date.now();
   next();
-});
+}); // nu afisam turul secret
 
 tourSchema.post(/^find/, function (docs, next) {
   // console.log(docs);
@@ -107,6 +107,7 @@ tourSchema.post(/^find/, function (docs, next) {
 
 //AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
+  this.start = Date.now();
   //this points to the current aggregation object
   this.pipelin().unshift({ $match: { secretTour: { $ne: true } } });
   console.log(this.pipeline());

@@ -1,5 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
+
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
@@ -13,11 +16,6 @@ app.use(express.json()); //this is middleware (se aflta intre requesti si respon
 app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
-  console.log('Hello from the middleware!');
-  next();
-});
-
-app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
@@ -25,5 +23,19 @@ app.use((req, res, next) => {
 //here we mount the routers
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+
+app.all('*', (req, res, next) => {
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Can't find ${req.originalURL} on this server`,
+  // });
+  // const err = new Error(`Can't find ${req.originalUrl} on this server`);
+  // err.status = 'fail';
+  // err.statusCode = 404;
+
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404)); //ce este in next nodejs va zice ca este eroare
+});
+
+app.use(globalErrorHandler);
 
 module.exports = app;
